@@ -1,32 +1,19 @@
-name: Continuous Integration
+name: CI-macos
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    name: "Build ${{ matrix.os }}"
-    strategy:
-      matrix:
-        os: [windows-2016, ubuntu-latest, macos-latest]
+    runs-on: macos-latest
 
-    steps:
-    - uses: actions/checkout@v2
-    # Install node
-    - uses: actions/setup-node@v2-beta
-      with:
-        node-version: 12
-    - name: Install dependencies (Ubuntu)
-      run: sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libegl1-mesa-dev mesa-utils mesa-utils-extra ragel
-      if: matrix.os == 'ubuntu-latest'
-    # Install esy@0.6.6
-    - name: Install esy
-      run: npm i -g esy
-    - name: Install dependencies
-      run: esy i
-    - name: Build project
-      run: esy build
+    steps:         
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Esy setup
+        run: |
+          npm install -g esy@latest
+          esy install
+          esy build --verbosity=debug
